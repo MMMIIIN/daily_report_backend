@@ -9,13 +9,18 @@ export class UserController {
   constructor(private userService: UserService) {}
 
   @Get()
-  async getOneUser(@Query('email') userEmail: string): Promise<User> {
-    return this.userService.findOne(userEmail);
+  async getOneUser(@Query('email') userEmail: string): Promise<String> {
+    return this.userService.findOneUser(userEmail);
   }
 
   @Get('list')
   async showListAll() {
     return this.userService.findAll();
+  }
+
+  @Get('clear')
+  async clearUser() {
+    return this.userService.clearUser();
   }
 
   @Post('login')
@@ -24,8 +29,8 @@ export class UserController {
   }
 
   @Post('create')
-  async createUser(@Body() user: CreateUserDto) {
-    return await this.userService.createUser(user);
+  createUser(@Body() user: CreateUserDto) {
+    return this.userService.createUser(user);
   }
 
   @Delete('delete')
