@@ -1,8 +1,17 @@
-import { Body, Controller, Delete, Get, Post, Query } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Post,
+  Query,
+  Req,
+  Res,
+} from '@nestjs/common';
 import { CreateUserDto } from './dto/user.create.dto';
 import { LoginUserDto } from './dto/user.login.dto';
-import { User } from './entities/user.entity';
 import { UserService } from './user.service';
+import { Request, Response } from 'express';
 
 @Controller('user')
 export class UserController {
@@ -11,6 +20,11 @@ export class UserController {
   @Get()
   async getOneUser(@Query('email') userEmail: string): Promise<String> {
     return this.userService.findOneUser(userEmail);
+  }
+
+  @Get('cookie')
+  async cookieTest(@Req() request: Request) {
+    console.log(request.cookies);
   }
 
   @Get('list')
@@ -24,8 +38,23 @@ export class UserController {
   }
 
   @Post('login')
-  async loginUser(@Body() user: LoginUserDto) {
-    return this.userService.loginUser(user);
+  async loginUser(
+    @Body() user: LoginUserDto,
+    @Res({ passthrough: true }) response: Response,
+  ) {
+    const jwt = this.userService.loginUser(user);
+    if ((await jwt).length > 20) {
+      response.cookie('jwt', jwt, { httpOnly: true });
+      return 'success!!';
+    } else {
+      return 'login fail';
+    }
+  }
+
+  @Post('logout')
+  async logoutUser(@Res({ passthrough: true }) response: Response) {
+    response.clearCookie('jwt');
+    return 'logout success';
   }
 
   @Post('create')

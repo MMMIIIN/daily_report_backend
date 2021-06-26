@@ -16,7 +16,19 @@ export class TodoService {
     return this.todoRepository.find();
   }
 
+  async findUidList(uid: String): Promise<Todo[]> {
+    return this.todoRepository.find({
+      where: {
+        uid: uid,
+      },
+    });
+  }
+
   async saveTodo(todo: CreateTodoDto): Promise<void> {
     await this.todoRepository.save(todo);
+  }
+
+  async clearList() {
+    await this.todoRepository.clear();
   }
 }
